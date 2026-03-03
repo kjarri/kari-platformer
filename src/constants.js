@@ -13,8 +13,18 @@ export const POWERUP_TYPES = {
 
 export const GAME_STATES = {
   TITLE: 'title',
+  MENU: 'menu',
   PLAYING: 'playing',
   GAMEOVER: 'gameover',
   WIN: 'win',
   PAUSED: 'paused'
+};
+
+export const SCREEN_SHAKE = {
+  duration: 15,
+  intensity: 5
+};
+
+export const HIT_STOP = {
+  duration: 5
 };

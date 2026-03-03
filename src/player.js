@@ -39,6 +39,8 @@ export class Player {
 
   update(keys, platforms) {
     const speed = this.speedBoost > 0 ? MOVE_SPEED * 1.5 : MOVE_SPEED;
+    
+    const wasOnGround = this.onGround;
 
     if (keys.left) {
       this.velX = -speed;
@@ -51,7 +53,6 @@ export class Player {
     }
 
     const wantsToJump = keys.jump || keys.jumpBuffered;
-    const wasOnGround = this.onGround;
 
     if (wantsToJump && (this.onGround || this.coyoteTime > 0)) {
       this.velY = JUMP_FORCE;
@@ -60,7 +61,7 @@ export class Player {
       this.jumpBuffer = 0;
     }
 
-    if (!wasOnGround && this.onGround && this.velY > 0) {
+    if (wasOnGround && !this.onGround && this.velY > 0) {
       this.coyoteTime = this.coyoteFrames;
     }
     if (this.coyoteTime > 0) this.coyoteTime--;

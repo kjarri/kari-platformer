@@ -4,8 +4,9 @@ import { initInput, getKeys, setPlayerRef } from './input.js';
 import * as audio from './audio.js';
 import * as particles from './particles.js';
 import * as levelManager from './levelManager.js';
-import { setGameState, getGameState, updateTitle, drawTitleScreen, drawHUD, drawGameOver, drawWin } from './ui.js';
+import { setGameState, getGameState, updateTitle, drawTitleScreen, drawHUD, drawGameOver, drawWin, drawMenuScreen, drawLevelSelect, updateMenu, updateLevelSelect, triggerScreenShake, triggerHitStop, updateScreenShake, getScreenShakeOffset, updateHitStop, isHitStopped } from './ui.js';
 import * as renderer from './renderer.js';
+import * as saveManager from './saveManager.js';
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -24,6 +25,7 @@ let fallRespawnCooldown = 0;
 let enemyBullets = [];
 
 let logoImage = null;
+let saveData = null;
 
 const player = new Player();
 setPlayerRef(player);
@@ -400,7 +402,12 @@ function selectLevel(level) {
 }
 
 function gameLoop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const shakeOffset = getScreenShakeOffset();
+  
+  ctx.save();
+  ctx.translate(shakeOffset.x, shakeOffset.y);
+  
+  ctx.clearRect(-10, -10, canvas.width + 20, canvas.height + 20);
   
   const currentState = getGameState();
   
@@ -408,10 +415,18 @@ function gameLoop() {
     drawTitleScreen(ctx, logoImage);
     const started = updateTitle();
     if (started) {
-      levelManager.generateWorld();
-      setGameState(GAME_STATES.PLAYING);
-      logEvent('--- LEIKUR BYRJAÐUR ---');
+      saveData = saveManager.loadGame();
+      audio.setSoundEnabled(saveData.soundEnabled);
     }
+  } else if (currentState === GAME_STATES.MENU) {
+    drawMenuScreen(ctx, logoImage, saveData);
+    const selected = updateMenu(() => {
+      levelManager.setLevel(1);
+      startNewGame();
+    }, () => {
+      levelManager.setLevel(saveManager.getHighestLevel());
+      startGame();
+    });
   } else if (currentState === GAME_STATES.PLAYING) {
     renderer.drawBackground(ctx);
     renderer.drawDecorations(ctx, cameraX);
@@ -427,18 +442,23 @@ function gameLoop() {
     player.draw(ctx, cameraX);
     drawHUD(ctx, player, score, cameraX);
     
-    if (!gameOver && !gameWon) {
-      updatePlayer();
-      updateEnemies();
-      updateBoss();
-      updateBullets();
-      particles.updateParticles();
-      updateCamera();
-    } else if (gameWon) {
-      drawWin(ctx, score);
-    } else {
-      drawGameOver(ctx, score);
+    if (!isHitStopped()) {
+      if (!gameOver && !gameWon) {
+        updatePlayer();
+        updateEnemies();
+        updateBoss();
+        updateBullets();
+        particles.updateParticles();
+        updateCamera();
+      } else if (gameWon) {
+        drawWin(ctx, score);
+      } else {
+        drawGameOver(ctx, score);
+      }
     }
+    
+    updateScreenShake();
+    updateHitStop();
     
     if (DEBUG_MODE) {
       ctx.fillStyle = '#000';
@@ -454,10 +474,47 @@ function gameLoop() {
     }
   }
   
+  ctx.restore();
+  
   requestAnimationFrame(gameLoop);
 }
 
+function startNewGame() {
+  score = 0;
+  gameOver = false;
+  gameWon = false;
+  cameraX = 0;
+  bullets = [];
+  enemyBullets = [];
+  boss = null;
+  shootCooldown = 0;
+  particles.clearParticles();
+  levelManager.generateWorld();
+  player.reset(100, 300);
+  setGameState(GAME_STATES.PLAYING);
+  logEvent('--- NÝR LEIKUR: Borð ' + levelManager.currentLevel + ' ---');
+}
+
+function startGame() {
+  score = 0;
+  gameOver = false;
+  gameWon = false;
+  cameraX = 0;
+  bullets = [];
+  enemyBullets = [];
+  boss = null;
+  shootCooldown = 0;
+  particles.clearParticles();
+  levelManager.generateWorld();
+  player.reset(100, 300);
+  setGameState(GAME_STATES.PLAYING);
+  logEvent('--- LEIKUR HEFST: Borð ' + levelManager.currentLevel + ' ---');
+}
+
 function init() {
+  saveData = saveManager.loadGame();
+  audio.setSoundEnabled(saveData.soundEnabled);
+  
   const logoImg = new Image();
   logoImg.src = 'logo.svg';
   logoImg.onload = () => {
