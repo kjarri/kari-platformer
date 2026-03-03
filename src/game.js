@@ -1,10 +1,10 @@
 import { SCREEN_WIDTH, SCREEN_HEIGHT, GAME_STATES, POWERUP_TYPES } from './constants.js';
 import { Player } from './player.js';
-import { initInput, getKeys, setPlayerRef, setRestartCallback } from './input.js';
+import { initInput, getKeys, setPlayerRef, setRestartCallback, setPauseCallback } from './input.js';
 import * as audio from './audio.js';
 import * as particles from './particles.js';
 import * as levelManager from './levelManager.js';
-import { setGameState, getGameState, updateTitle, drawTitleScreen, drawHUD, drawGameOver, drawWin, triggerScreenShake, triggerHitStop, updateScreenShake, getScreenShakeOffset, updateHitStop, isHitStopped } from './ui.js';
+import { setGameState, getGameState, updateTitle, drawTitleScreen, drawHUD, drawGameOver, drawWin, triggerScreenShake, triggerHitStop, updateScreenShake, getScreenShakeOffset, updateHitStop, isHitStopped, drawPauseMenu } from './ui.js';
 import * as renderer from './renderer.js';
 import * as saveManager from './saveManager.js';
 
@@ -17,6 +17,7 @@ let eventLog = [];
 let score = 0;
 let gameOver = false;
 let gameWon = false;
+let paused = false;
 let cameraX = 0;
 let bullets = [];
 let boss = null;
@@ -530,6 +531,7 @@ function resetGame() {
   score = 0;
   gameOver = false;
   gameWon = false;
+  paused = false;
   cameraX = 0;
   bullets = [];
   enemyBullets = [];
@@ -595,7 +597,9 @@ function gameLoop() {
     
     drawHUD(ctx, player, score, cameraX);
     
-    if (!isHitStopped()) {
+    if (paused) {
+      drawPauseMenu(ctx);
+    } else if (!isHitStopped()) {
       if (!gameOver && !gameWon) {
         updatePlayer();
         updateEnemies();
@@ -680,6 +684,11 @@ function init() {
   setRestartCallback(() => {
     if (gameOver || gameWon) {
       resetGame();
+    }
+  });
+  setPauseCallback(() => {
+    if (getGameState() === GAME_STATES.PLAYING) {
+      paused = !paused;
     }
   });
   audio.initAudio();

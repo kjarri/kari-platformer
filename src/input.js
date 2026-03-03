@@ -7,11 +7,13 @@ export const keys = {
   shootDown: false,
   jumpBuffered: false,
   restart: false,
-  melee: false
+  melee: false,
+  pause: false
 };
 
 let playerRef = null;
 let restartCallback = null;
+let pauseCallback = null;
 
 export function setPlayerRef(player) {
   playerRef = player;
@@ -19,6 +21,10 @@ export function setPlayerRef(player) {
 
 export function setRestartCallback(callback) {
   restartCallback = callback;
+}
+
+export function setPauseCallback(callback) {
+  pauseCallback = callback;
 }
 
 export function initInput(canvas) {
@@ -42,6 +48,10 @@ export function initInput(canvas) {
     }
     if (e.key === 'k' || e.key === 'K') {
       keys.melee = true;
+    }
+    if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+      keys.pause = true;
+      if (pauseCallback) pauseCallback();
     }
     if (e.key === 'ArrowLeft') {
       keys.shoot = true;
@@ -73,6 +83,7 @@ export function initInput(canvas) {
     if (e.key === 'w' || e.key === 'W' || e.key === ' ') keys.jump = false;
     if (e.key === 'r' || e.key === 'R') keys.restart = false;
     if (e.key === 'k' || e.key === 'K') keys.melee = false;
+    if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') keys.pause = false;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       keys.shoot = false;
     }

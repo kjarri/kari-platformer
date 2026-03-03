@@ -353,3 +353,20 @@ export function updateHitStop() {
     hitStopFrames--;
   }
 }
+
+export function drawPauseMenu(ctx) {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+  
+  ctx.fillStyle = '#f8f9fa';
+  ctx.font = 'bold 48px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('PAUSED', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 60);
+  
+  ctx.font = '20px "Courier New", monospace';
+  ctx.fillText('Press ESC or P to Resume', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 20);
+  
+  const blinkAlpha = 0.5 + Math.sin(Date.now() * 0.005) * 0.5;
+  ctx.fillStyle = `rgba(255, 255, 255, ${blinkAlpha})`;
+  ctx.fillText('Press R to Restart', SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 60);
+}
