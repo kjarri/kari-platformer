@@ -11,32 +11,37 @@
 - **Pit Respawn**: Fall damage logic instead of instant game over.
 - **Directional Shooting**: 4-way shooting mechanics.
 - **Touch Controls**: On-screen gamepad for mobile/tablet devices.
+- **Code Architecture**: Split into ES6 modules (player, input, audio, particles, levelManager, renderer, ui, saveManager).
+- **PWA Support**: Web manifest and service worker for offline play.
+- **Title Screen**: Animated logo with "Press any key to start".
+- **Save/Load System**: localStorage persistence for progress, coins, and settings.
+- **Screen Shake**: Camera shake on damage, enemy death, and boss defeat.
+- **Hit Stop**: Brief freeze on impacts for game feel.
+- **Coyote Time**: Jump shortly after leaving a ledge.
+- **Jump on Enemies**: Stomp enemies from above to defeat them.
 
 ---
 
 ## 🚀 High Priority / Next Steps
 
-### 1. Code Architecture Refactoring
-**Priority: High**
-The game codebase is getting too large for a single file. We need to split it into ES6 modules:
-- `player.js` - Player logic, physics, state
-- `enemies.js` - Enemy classes and AI
-- `level_manager.js` - Level loading and parsing
-- `renderer.js` - Canvas drawing logic
-- `audio.js` - Sound system
-- `input.js` - Keyboard and touch handling
+### 1. Code Architecture Refactoring ✅
+**Done** - Split into ES6 modules.
 
-### 2. Save/Load & Progression System
-**Priority: High**
-- Implement `localStorage` persistence for unlocked levels, high scores, and total coins.
-- Level select screen that visually shows locked/unlocked status.
-- Main Menu with "New Game" and "Continue" options.
+### 2. Save/Load & Progression System ✅
+**Done** - localStorage persistence implemented.
 
-### 3. Game Feel & "Juice"
-**Priority: High**
-- **Screen Shake**: Add subtle camera shake on player damage, boss defeats, or heavy impacts.
-- **Hit Stop/Pause**: Briefly freeze the game for a few milliseconds upon taking damage or defeating a large enemy to emphasize impact.
-- **Coyote Time & Jump Buffering**: Improve platforming feel by allowing jumps slightly after leaving a ledge, and queueing jump inputs just before hitting the ground.
+### 3. Game Feel & "Juice" ✅
+**Done**:
+- **Screen Shake**: Added for player damage, boss defeats, and impacts.
+- **Hit Stop/Pause**: Brief freeze on impacts.
+- **Coyote Time**: Jump shortly after leaving a ledge.
+- **Jump on Enemies**: Stomp enemies from above.
+
+### 4. Level Select with Visual Lock/Unlock ✅
+**Done** - Added level select screen with locked/unlocked visual status.
+
+### 5. Main Menu with New Game/Continue ✅
+**Done** - Added main menu with options.
 
 ---
 
@@ -84,8 +89,8 @@ The game codebase is getting too large for a single file. We need to split it in
 
 ## 📱 Tech, UI, & Polish
 
-### 9. Progressive Web App (PWA)
-**Priority: Medium**
+### 9. Progressive Web App (PWA) ✅
+**Done**:
 - Add a Web App Manifest and Service Worker.
 - Allow players to "Install" the game to their home screen on mobile/desktop.
 - Offline play support.
