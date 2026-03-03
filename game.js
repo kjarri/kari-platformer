@@ -62,7 +62,11 @@ const player = {
     velY: 0,
     onGround: false,
     color: '#e63946',
-    facingRight: true
+    facingRight: true,
+    health: 3,
+    maxHealth: 3,
+    invincible: 0,
+    invincibleDuration: 90
 };
 
 let platforms = [];
@@ -583,6 +587,20 @@ function playEnemyDeathSound() {
     osc.stop(audioCtx.currentTime + 0.15);
 }
 
+function playDamageSound() {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.2);
+}
+
 function playWinSound() {
     const notes = [523, 659, 784, 1047];
     notes.forEach((freq, i) => {
@@ -879,6 +897,10 @@ function drawDecorations() {
 }
 
 function drawPlayer() {
+    if (player.invincible > 0 && Math.floor(player.invincible / 5) % 2 === 0) {
+        return;
+    }
+    
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x - cameraX, player.y, player.width, player.height);
     
@@ -1066,9 +1088,15 @@ function updateEnemies() {
                 player.velY = -10;
                 score += 2;
                 playEnemyDeathSound();
-            } else if (!gameOver) {
-                playGameOverSound();
-                gameOver = true;
+            } else if (player.invincible <= 0) {
+                player.health--;
+                player.invincible = player.invincibleDuration;
+                playDamageSound();
+                logEvent('Spilari tokkadi skada - health: ' + player.health);
+                if (player.health <= 0) {
+                    gameOver = true;
+                    playGameOverSound();
+                }
             }
         }
     });
@@ -1108,6 +1136,24 @@ function drawScore() {
     ctx.font = 'bold 24px Courier New';
     ctx.fillText('Mynt: ' + score, 20, 40);
     ctx.fillText('Level: ' + currentLevel, 20, 70);
+    
+    for (let i = 0; i < player.maxHealth; i++) {
+        if (i < player.health) {
+            ctx.fillStyle = '#ff4444';
+            ctx.beginPath();
+            ctx.arc(20 + i * 30, 100, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.arc(20 + i * 30 - 3, 97, 3, 0, Math.PI * 2);
+            ctx.fill();
+        } else {
+            ctx.fillStyle = '#666666';
+            ctx.beginPath();
+            ctx.arc(20 + i * 30, 100, 10, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
     
     if (DEBUG_MODE) {
         ctx.fillStyle = '#ff0000';
@@ -1169,6 +1215,8 @@ function updateCamera() {
 }
 
 function updatePlayer() {
+    if (player.invincible > 0) player.invincible--;
+    
     if (keys.left) {
         player.velX = -MOVE_SPEED;
         player.facingRight = false;
@@ -1264,6 +1312,8 @@ function resetGame() {
     player.velX = 0;
     player.velY = 0;
     player.facingRight = true;
+    player.health = player.maxHealth;
+    player.invincible = 0;
     score = 0;
     gameOver = false;
     gameWon = false;
