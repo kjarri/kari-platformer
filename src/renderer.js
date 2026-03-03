@@ -191,6 +191,20 @@ export function drawDecorations(ctx, cameraX) {
         ctx.arc(dx, dec.y, dec.size, 0, Math.PI * 2);
         ctx.fill();
         break;
+        
+      case 'spikes':
+        ctx.fillStyle = '#666';
+        const spikeCount = Math.floor(dec.width / 10);
+        for (let i = 0; i < spikeCount; i++) {
+          const spikeX = dx + i * 10;
+          ctx.beginPath();
+          ctx.moveTo(spikeX, dec.y + dec.height);
+          ctx.lineTo(spikeX + 5, dec.y);
+          ctx.lineTo(spikeX + 10, dec.y + dec.height);
+          ctx.closePath();
+          ctx.fill();
+        }
+        break;
     }
   });
 }
@@ -226,6 +240,23 @@ export function drawPlatforms(ctx, cameraX) {
     if (platform.x - cameraX > SCREEN_WIDTH || platform.x + platform.width - cameraX < 0) return;
     
     const px = platform.x - cameraX;
+    
+    if (platform.moving) {
+      ctx.fillStyle = '#8b5a2b';
+      ctx.beginPath();
+      ctx.roundRect(px, platform.y, platform.width, platform.height, 5);
+      ctx.fill();
+      ctx.fillStyle = '#a0522d';
+      ctx.fillRect(px, platform.y, platform.width, 6);
+      
+      ctx.fillStyle = '#ffd700';
+      for (let i = 0; i < platform.width; i += 20) {
+        ctx.beginPath();
+        ctx.arc(px + i + 10, platform.y + platform.height / 2, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      return;
+    }
     
     switch(theme) {
       case 'desert':

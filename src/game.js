@@ -392,6 +392,75 @@ function updateCamera() {
   cameraX = Math.max(0, Math.min(cameraX, levelManager.getWorldWidth() - SCREEN_WIDTH));
 }
 
+function updateMovingPlatforms() {
+  const platforms = levelManager.getPlatforms();
+  let playerOnMovingPlatform = null;
+  
+  platforms.forEach(platform => {
+    if (!platform.moving) return;
+    
+    const prevX = platform.x;
+    const prevY = platform.y;
+    
+    if (platform.moveX) {
+      platform.x += platform.moveX;
+      if (platform.minX && platform.x <= platform.minX) {
+        platform.x = platform.minX;
+        platform.moveX *= -1;
+      }
+      if (platform.maxX && platform.x >= platform.maxX) {
+        platform.x = platform.maxX;
+        platform.moveX *= -1;
+      }
+    }
+    
+    if (platform.moveY) {
+      platform.y += platform.moveY;
+      if (platform.minY && platform.y <= platform.minY) {
+        platform.y = platform.minY;
+        platform.moveY *= -1;
+      }
+      if (platform.maxY && platform.y >= platform.maxY) {
+        platform.y = platform.maxY;
+        platform.moveY *= -1;
+      }
+    }
+    
+    const dx = platform.x - prevX;
+    const dy = platform.y - prevY;
+    
+    if (player.onGround && 
+        player.y + player.height >= platform.y - 5 &&
+        player.y + player.height <= platform.y + 10 &&
+        player.x + player.width > platform.x &&
+        player.x < platform.x + platform.width) {
+      player.x += dx;
+      player.y += dy;
+    }
+  });
+}
+
+function updateSpikes() {
+  const decorations = levelManager.getDecorations();
+  
+  decorations.forEach(dec => {
+    if (dec.type !== 'spikes') return;
+    
+    if (!player.invincible && checkCollision(player, dec)) {
+      if (player.takeDamage()) {
+        triggerScreenShake(8, 10);
+        triggerHitStop(3);
+        audio.playDamageSound();
+        particles.createExplosion(player.x + player.width/2, player.y + player.height/2, '#e63946', 10);
+        if (player.health <= 0) {
+          gameOver = true;
+          audio.playGameOverSound();
+        }
+      }
+    }
+  });
+}
+
 function resetGame() {
   console.trace('resetGame CALLED');
   logEvent('Byrja aftur kallað');
@@ -457,6 +526,8 @@ function gameLoop() {
         updateEnemies();
         updateBoss();
         updateBullets();
+        updateMovingPlatforms();
+        updateSpikes();
         particles.updateParticles();
         updateCamera();
       } else if (gameWon) {

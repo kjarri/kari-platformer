@@ -220,27 +220,35 @@ function generateLevel3() {
   
   platforms.push({ x: 0, y: 550, width: 400, height: 50 });
   
-  for (let i = 0; i < 10; i++) {
+  platforms.push({ x: 400, y: 450, width: 100, height: 20, moving: true, moveX: 2, minX: 400, maxX: 600 });
+  platforms.push({ x: 700, y: 380, width: 100, height: 20, moving: true, moveY: 1.5, minY: 280, maxY: 450 });
+  
+  for (let i = 0; i < 8; i++) {
     platforms.push({
-      x: 450 + i * 160,
+      x: 500 + i * 180,
       y: 480 - Math.sin(i * 0.8) * 150,
-      width: 80 + Math.random() * 60,
+      width: 80 + Math.random() * 40,
       height: 25
     });
   }
   
-  platforms.push({ x: 2000, y: 550, width: 500, height: 50 });
+  platforms.push({ x: 1800, y: 550, width: 300, height: 50 });
+  platforms.push({ x: 2200, y: 550, width: 300, height: 50 });
   
-  for (let i = 0; i < 8; i++) {
+  platforms.push({ x: 2000, y: 400, width: 120, height: 20, moving: true, moveX: 1.5, minX: 1950, maxX: 2250 });
+  
+  for (let i = 0; i < 6; i++) {
     platforms.push({
-      x: 2100 + i * 140,
+      x: 2100 + i * 150,
       y: 420 - i * 50,
       width: 70,
       height: 25
     });
   }
   
-  platforms.push({ x: 3200, y: 550, width: 500, height: 50 });
+  platforms.push({ x: 3000, y: 550, width: 400, height: 50 });
+  
+  platforms.push({ x: 3200, y: 350, width: 100, height: 20, moving: true, moveY: 2, minY: 250, maxY: 450 });
   
   for (let i = 0; i < 15; i++) {
     decorations.push({ type: 'stalactite', x: 50 + i * 200, y: 60 + Math.random() * 30, size: 30 + Math.random() * 30 });
@@ -248,6 +256,10 @@ function generateLevel3() {
   for (let i = 0; i < 10; i++) {
     decorations.push({ type: 'rock', x: 100 + i * 300, y: 530, size: 15 + Math.random() * 20 });
   }
+  
+  decorations.push({ type: 'spikes', x: 800, y: 535, width: 80, height: 15 });
+  decorations.push({ type: 'spikes', x: 1400, y: 535, width: 60, height: 15 });
+  decorations.push({ type: 'spikes', x: 2600, y: 535, width: 100, height: 15 });
   
   for (let i = 0; i < 25; i++) {
     coins.push({
@@ -259,7 +271,7 @@ function generateLevel3() {
     });
   }
   
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 12; i++) {
     enemies.push({
       x: 200 + i * 250,
       y: 520,
