@@ -1918,11 +1918,13 @@ if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
 
 const restartBtn = document.getElementById('restartBtn');
 if (restartBtn) {
-    restartBtn.addEventListener('click', function() {
+    restartBtn.addEventListener('click', function(e) {
+        console.log('Restart button clicked');
         resetGame();
     });
     restartBtn.addEventListener('touchend', function(e) {
         e.preventDefault();
+        console.log('Restart button touched');
         resetGame();
     });
 }

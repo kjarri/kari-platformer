@@ -274,10 +274,12 @@
             margin-bottom: 15px;
             pointer-events: auto;
             z-index: 100;
+            touch-action: manipulation;
         }
         @media (hover: none) and (pointer: coarse) {
             #restartBtn {
                 display: inline-block;
+                z-index: 999;
             }
         }
     </style>
