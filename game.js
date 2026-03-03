@@ -1915,3 +1915,14 @@ function setupTouchControls() {
 if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
     setupTouchControls();
 }
+
+const restartBtn = document.getElementById('restartBtn');
+if (restartBtn) {
+    restartBtn.addEventListener('click', function() {
+        resetGame();
+    });
+    restartBtn.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        resetGame();
+    });
+}

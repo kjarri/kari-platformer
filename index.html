@@ -220,10 +220,15 @@
                 width: 150px;
                 height: 65px;
                 border-radius: 12px;
+                font-size: 14px;
             }
             .touch-row {
                 display: flex;
                 gap: 10px;
+            }
+            .touch-row .touch-btn {
+                width: 70px;
+                font-size: 12px;
             }
         }
         @media (min-width: 768px) {
@@ -268,6 +273,7 @@
             font-family: 'Courier New', monospace;
             margin-bottom: 15px;
             pointer-events: auto;
+            z-index: 100;
         }
         @media (hover: none) and (pointer: coarse) {
             #restartBtn {
@@ -296,10 +302,10 @@
             </div>
             <div class="touch-btn-group right">
                 <div class="touch-row">
-                    <div class="touch-btn shoot" id="touchShoot">💥</div>
-                    <div class="touch-btn shoot-up" id="touchShootUp">⬆</div>
+                    <div class="touch-btn shoot" id="touchShoot">shoot</div>
+                    <div class="touch-btn shoot-up" id="touchShootUp">shoot up</div>
                 </div>
-                <div class="touch-btn jump" id="touchJump">↟</div>
+                <div class="touch-btn jump" id="touchJump">jump</div>
             </div>
         </div>
         <div class="controls">
