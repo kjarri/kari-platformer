@@ -1,34 +1,207 @@
-# Improvements needed.
+# Platformer Game - Improvements & Ideas
 
-## Improve the architecture of the code
-The code is currently a bit of a mess, and it would be nice to refactor it to make it more organized and easier to understand. This would also make it easier to add new features in the future.
+## Completed Features
 
-## Health system
-We currently die upon touching an enemy, but it would be nice to have a health system where the player can take a few hits before dying. This would make the game more forgiving and allow for more complex level design.
+### ✅ Health System
+Implemented a 3-HP health system with invincibility frames (90 frames) after taking damage. Player displays hearts in UI.
 
-## More complex landscape design for the levels.
-The aesthetic should still be that of a simple platformer, but it should still be well made and fun. 
+### ✅ Visual Effects
+Added particle system for:
+- Coin collection (gold particles)
+- Enemy death (purple particles)
+- Jumping (gray dust particles)
+- Boss defeat (large orange explosion)
+- Power-up collection (colored particles)
 
-## More levels.
-The game currently has 5 levels, but it would be nice to have more.
+Player also has visual effects when powered up:
+- Shield: Cyan glowing ring that pulses
+- Speed boost: Orange glow effect around player
 
-## More sound effects.
-The game currently has a few sound effects, but it would be nice to have more.
+### ✅ Sound Effects
+Web Audio API-based sounds for:
+- Jump
+- Coin collection
+- Damage taken
+- Level complete
+- Shooting
+- Game over
 
-## More visual effects.
-The game currently has bascially no visual effects, it would be nice to have some.
+### ✅ More Enemy Types
+Three enemy types implemented:
+1. **Ground enemies** (purple) - Walk back and forth on platforms
+2. **Flying enemies** (red with wings) - Fly horizontally with sinusoidal vertical movement
+3. **Shooter enemies** (green) - Patrol platforms and shoot at player when in range
 
-## More enemy types.
-The game currently has only one type of enemy, it would be nice to have more. Perhaps a flying enemy that can shoot projectiles at the player, or a stationary enemy that shoots projectiles at the player when they get too close.
+### ✅ Power-ups
+Two power-up types collectible throughout levels:
+1. **Shield** (cyan, marked "S") - Blocks one hit, lasts 10 seconds (600 frames)
+2. **Speed Boost** (orange, marked ">") - 1.5x movement speed, lasts ~7 seconds (400 frames)
 
-## Power-ups
-The game currently has no power-ups, it would be nice to have some. Perhaps a power-up that gives the player a temporary shield, or a power-up that gives the player a temporary speed boost.
+### ✅ Boss Fights
+Level 5 (volcanic theme) features a boss:
+- Large red boss enemy with 10 HP
+- Flies and patrols in area
+- Shoots tracking bullets at player
+- Health bar displayed above boss
+- Castle door locked until boss defeated
+- 50 bonus points for defeating boss
 
-## Boss fights
-The game currently has no boss fights, it would be nice to have some. Perhaps a boss that is a giant enemy that the player has to defeat in order to progress to the next level. Nothing too complex or difficult for now, just something that adds a bit of variety to the gameplay.
+### ✅ Pit Respawn
+Falling off map now respawns player instead of instant death:
+- Player respawns slightly back from fall location
+- Loses 1 HP (or shield if active)
+- 1-second invincibility after respawn
+- Cooldown prevents infinite respawn abuse
 
-## Falling into pits should not be an instant death.
-Currently, if the player falls into a pit, they die instantly. We don't have checkpoints, so the player should respawn a short distance before the pit instead of dying immediately. We need to make sure that the player can't just keep falling into the pit and respawning indefinitely. The player should lose life points each time they fall into a pit.
+### ✅ Directional Shooting
+Can now shoot in 4 directions:
+- Left/Right arrows: horizontal shooting
+- Up arrow: shoot upward
+- Down arrow: shoot downward (while on ground)
 
-## Allow the player to shoot upwards and downwards.
-Currently, the player can only shoot horizontally, but it would be nice to allow the player to shoot upwards and downwards as well. We already use the left and right arrows for shooting, so we could use the up and down arrows for shooting in those directions. This would add a bit more depth to the combat and allow for more interesting enemy designs.
+### ✅ Touch Controls (iPad)
+On-screen touch buttons for mobile/tablet:
+- Left/right movement buttons
+- Jump button
+- Shoot buttons (left, right, up, down)
+- Prevents default touch behaviors (text selection, zoom, scroll)
+- Auto-shows on touch devices, hides on desktop
+
+---
+
+## Future Improvements
+
+### 1. Code Architecture Refactoring
+**Priority: Medium**
+
+The game.js file has grown to 1800+ lines. Consider splitting into modules:
+- `player.js` - Player logic, physics, state
+- `enemies.js` - Enemy classes and AI
+- `levels.js` - Level generation functions
+- `audio.js` - Sound effect functions
+- `ui.js` - UI rendering and touch controls
+
+Benefits: Easier to maintain, test, and add new features.
+
+### 2. Save/Load System
+**Priority: High**
+
+Add localStorage persistence:
+```javascript
+// Save data structure
+{
+  currentLevel: 3,
+  highScore: 1250,
+  totalCoins: 87,
+  levelsUnlocked: 3,
+  settings: { soundEnabled: true }
+}
+```
+- Save progress automatically on level complete
+- Save on game over
+- Load on game start
+- Add "Continue" button to title screen
+
+### 3. Moving Platforms
+**Priority: Medium**
+
+Add dynamic platforms:
+- Horizontal movement (patrol back and forth)
+- Vertical movement (elevators)
+- Speed and range configurable per platform
+
+```javascript
+// Example platform data
+{ x: 100, y: 300, width: 100, height: 20, velX: 1, minX: 50, maxX: 250 }
+```
+
+### 4. Level Hazards
+**Priority: Medium**
+
+Add environmental dangers:
+- **Spikes** - Instant damage on contact, positioned on platforms
+- **Lava pools** - Damage over time, visual bubbling effect
+- **Sawblades** - Moving hazards that patrol areas
+
+### 5. Secret Areas & Warps
+**Priority: Low**
+
+Add exploration rewards:
+- Hidden passages behind decorations or platform edges
+- Warp pipes that shortcut to later parts of level
+- Bonus rooms with extra coins/power-ups
+- Visual hint (slightly different background color, particles)
+
+### 6. Collectibles Expansion
+**Priority: Low**
+
+Beyond coins, add:
+- **Gems** (3 colors: red=50pts, blue=100pts, green=25pts)
+- **Keys** - Collect to unlock special doors
+- **Hearts** - Restore 1 HP (rare find)
+- **Stars** - Temporary invincibility
+
+### 7. Enemy Variety Expansion
+**Priority: Medium**
+
+New enemy types to add:
+- **Tank enemies** - Slow movement, high HP (3-5 hits), larger size
+- **Ninja enemies** - Fast, teleport short distances periodically
+- **Swarm enemies** - Small, numerous, move in groups
+- **Boss phases** - Level 5 boss gains new attacks at 50% HP
+
+### 8. Combat Enhancements
+**Priority: Low**
+
+Expand combat options:
+- **Piercing bullets** - Go through enemies (collectible power-up)
+- **Melee attack** - Short-range attack with W/Down key
+- **Enemy weak points** - Some enemies take more damage from specific angles
+
+### 9. UI/UX Improvements
+**Priority: High**
+
+- **Pause menu** - Press Escape/P to pause, resume, restart, or quit to menu
+- **Level select screen** - Visual level cards, lock progression until completed
+- **Settings menu** - Sound toggle, controls display
+- **Combo counter** - Display for consecutive kills without taking damage
+- **Timer** - Optional speedrun mode with level completion times
+
+### 10. Title Screen & Polish
+**Priority: Low**
+
+- Animated title screen with "Press any key to start"
+- Game logo/title artwork
+- Animated "You Win" / "Game Over" screens
+- Level complete screen showing: coins collected, enemies defeated, time
+- Transition animations between levels
+
+### 11. Level Expansion
+**Priority: Medium**
+
+Add more levels:
+- **Level 6**: Night sky theme with lightning hazards
+- **Level 7**: Underwater theme (slow falling, bubbles)
+- **Level 8**: Industrial theme with gears and conveyors
+
+### 12. Gamepad Support
+**Priority: Low**
+
+Add controller support:
+- Standard gamepad API integration
+- Map buttons to jump, shoot, pause
+- Visual prompt when controller connected
+
+---
+
+## Technical Debt
+
+### Known Issues
+- Platform indices in level data must be manually managed when adding/removing platforms
+- No collision detection optimization (spatial hashing or quadtree)
+- All graphics are simple rectangles/circles - could benefit from sprites
+
+### Performance Considerations
+- Particle system could be optimized for mobile
+- Consider object pooling for bullets and particles
+- Lazy-load level data if adding many levels
