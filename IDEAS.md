@@ -37,11 +37,10 @@
 - **Coyote Time**: Jump shortly after leaving a ledge.
 - **Jump on Enemies**: Stomp enemies from above.
 
-### 4. Level Select with Visual Lock/Unlock ✅
-**Done** - Added level select screen with locked/unlocked visual status.
-
-### 5. Main Menu with New Game/Continue ✅
-**Done** - Added main menu with options.
+### 4. Level Select
+**Priority: Medium**
+- Level select screen that visually shows locked/unlocked status.
+- Access via level buttons or level select UI.
 
 ---
 
