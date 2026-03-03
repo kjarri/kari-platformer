@@ -75,6 +75,7 @@ let enemies = [];
 let castle = {};
 let decorations = [];
 let bullets = [];
+let particles = [];
 let shootCooldown = 0;
 
 function generateLevel1() {
@@ -601,6 +602,45 @@ function playDamageSound() {
     osc.stop(audioCtx.currentTime + 0.2);
 }
 
+function createParticles(x, y, color, count, spread, life) {
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * spread,
+            vy: (Math.random() - 0.5) * spread - 2,
+            life: life,
+            maxLife: life,
+            color: color,
+            size: 3 + Math.random() * 4
+        });
+    }
+}
+
+function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.1;
+        p.life--;
+        if (p.life <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+}
+
+function drawParticles() {
+    particles.forEach(p => {
+        ctx.globalAlpha = p.life / p.maxLife;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x - cameraX, p.y, p.size * (p.life / p.maxLife), 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+}
+
 function playWinSound() {
     const notes = [523, 659, 784, 1047];
     notes.forEach((freq, i) => {
@@ -1125,6 +1165,7 @@ function updateBullets() {
                 bullets.splice(i, 1);
                 score += 2;
                 playEnemyDeathSound();
+                createParticles(enemy.x + enemy.width/2, enemy.y + enemy.height/2, '#9d4edd', 12, 6, 25);
                 break;
             }
         }
@@ -1246,6 +1287,7 @@ function updatePlayer() {
         player.velY = JUMP_FORCE;
         player.onGround = false;
         playJumpSound();
+        createParticles(player.x + player.width/2, player.y + player.height, '#cccccc', 5, 3, 15);
     }
 
     player.velY += GRAVITY;
@@ -1300,6 +1342,7 @@ function updatePlayer() {
             coin.collected = true;
             score++;
             playCoinSound();
+            createParticles(coin.x + coin.width/2, coin.y + coin.height/2, '#ffd700', 8, 4, 20);
         }
     });
 }
@@ -1342,6 +1385,7 @@ function gameLoop() {
     drawCoins();
     drawEnemies();
     drawBullets();
+    drawParticles();
     drawPlayer();
     drawScore();
 
@@ -1349,6 +1393,7 @@ function gameLoop() {
         updatePlayer();
         updateEnemies();
         updateBullets();
+        updateParticles();
         updateCamera();
     } else if (gameWon) {
         drawWin();
