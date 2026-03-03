@@ -6,7 +6,8 @@ export const keys = {
   shootUp: false,
   shootDown: false,
   jumpBuffered: false,
-  restart: false
+  restart: false,
+  melee: false
 };
 
 let playerRef = null;
@@ -39,6 +40,9 @@ export function initInput(canvas) {
       keys.restart = true;
       if (restartCallback) restartCallback();
     }
+    if (e.key === 'k' || e.key === 'K') {
+      keys.melee = true;
+    }
     if (e.key === 'ArrowLeft') {
       keys.shoot = true;
       keys.shootUp = false;
@@ -68,6 +72,7 @@ export function initInput(canvas) {
     if (e.key === 'd' || e.key === 'D') keys.right = false;
     if (e.key === 'w' || e.key === 'W' || e.key === ' ') keys.jump = false;
     if (e.key === 'r' || e.key === 'R') keys.restart = false;
+    if (e.key === 'k' || e.key === 'K') keys.melee = false;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       keys.shoot = false;
     }

@@ -96,6 +96,56 @@ function shoot() {
   }
 }
 
+let meleeCooldown = 0;
+let meleeActive = false;
+let meleeFrame = 0;
+
+function meleeAttack() {
+  if (meleeCooldown > 0 || meleeActive) return;
+  
+  meleeActive = true;
+  meleeFrame = 10;
+  meleeCooldown = 25;
+  
+  const meleeRange = 50;
+  const meleeX = player.facingRight ? player.x + player.width : player.x - meleeRange;
+  const meleeY = player.y;
+  const meleeWidth = meleeRange;
+  const meleeHeight = player.height;
+  
+  const enemies = levelManager.getEnemies();
+  enemies.forEach(enemy => {
+    if (enemy.hp !== undefined && enemy.hp <= 0) return;
+    
+    if (checkCollision({ x: meleeX, y: meleeY, width: meleeWidth, height: meleeHeight }, enemy)) {
+      enemy.hp = (enemy.hp || 1) - 2;
+      if (enemy.hp <= 0) {
+        triggerScreenShake(3, 5);
+        audio.playEnemyDeathSound();
+        particles.createExplosion(enemy.x + enemy.width/2, enemy.y + enemy.height/2, '#9b59b6', 15);
+        score += 5;
+      }
+    }
+  });
+  
+  if (boss && boss.alive) {
+    const bossHitbox = { x: meleeX, y: meleeY, width: meleeWidth, height: meleeHeight };
+    if (checkCollision(bossHitbox, boss)) {
+      boss.hp -= 2;
+      triggerScreenShake(5, 8);
+      particles.createParticles(boss.x + boss.width/2, boss.y + boss.height/2, '#ff0000', 8, 2, 8);
+      if (boss.hp <= 0) {
+        boss.alive = false;
+        triggerScreenShake(15, 25);
+        audio.playWinSound();
+        particles.createExplosion(boss.x + boss.width/2, boss.y + boss.height/2, '#ff4500', 40);
+        score += 50;
+        logEvent('YFIRMAÐNR SIGRÁÐUR!');
+      }
+    }
+  }
+}
+
 function updatePlayer() {
   const keys = getKeys();
   player.update(keys, levelManager.getPlatforms());
@@ -104,7 +154,19 @@ function updatePlayer() {
     shoot();
   }
   
+  if (keys.melee) {
+    meleeAttack();
+  }
+  
+  if (meleeActive) {
+    meleeFrame--;
+    if (meleeFrame <= 0) {
+      meleeActive = false;
+    }
+  }
+  
   if (shootCooldown > 0) shootCooldown--;
+  if (meleeCooldown > 0) meleeCooldown--;
   
   if (player.y > SCREEN_HEIGHT + 100) {
     if (fallRespawnCooldown === 0) {
@@ -518,6 +580,19 @@ function gameLoop() {
     renderer.drawBullets(ctx, enemyBullets, cameraX);
     particles.drawParticles(ctx, cameraX);
     player.draw(ctx, cameraX);
+    
+    if (meleeActive) {
+      const meleeX = player.facingRight ? player.x + player.width : player.x - 50;
+      const screenMeleeX = meleeX - cameraX;
+      
+      ctx.fillStyle = `rgba(255, 255, 255, ${meleeFrame / 10})`;
+      ctx.fillRect(screenMeleeX, player.y, 50, player.height);
+      
+      ctx.strokeStyle = `rgba(255, 215, 0, ${meleeFrame / 10})`;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(screenMeleeX, player.y, 50, player.height);
+    }
+    
     drawHUD(ctx, player, score, cameraX);
     
     if (!isHitStopped()) {
