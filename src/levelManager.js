@@ -373,6 +373,28 @@ function generateLevel4() {
     });
   }
   
+  enemies.push({
+    x: 1100,
+    y: 500,
+    width: 56,
+    height: 50,
+    velX: 0.5,
+    platformIndex: 7,
+    enemyType: 'tank',
+    hp: 5
+  });
+  
+  enemies.push({
+    x: 2400,
+    y: 500,
+    width: 56,
+    height: 50,
+    velX: -0.5,
+    platformIndex: 13,
+    enemyType: 'tank',
+    hp: 5
+  });
+  
   powerups.push(
     { x: 600, y: 450, width: 24, height: 24, type: 'shield', collected: false },
     { x: 1500, y: 400, width: 24, height: 24, type: 'speed', collected: false },

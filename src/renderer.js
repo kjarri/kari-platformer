@@ -398,6 +398,27 @@ export function drawEnemies(ctx, cameraX) {
         ctx.fill();
       }
       
+    } else if (enemy.enemyType === 'tank') {
+      ctx.fillStyle = '#4a4a4a';
+      ctx.beginPath();
+      ctx.roundRect(ex, enemy.y, enemy.width, enemy.height, 5);
+      ctx.fill();
+      
+      ctx.fillStyle = '#2d2d2d';
+      ctx.fillRect(ex + 5, enemy.y + 5, enemy.width - 10, 10);
+      ctx.fillRect(ex + 5, enemy.y + enemy.height - 10, enemy.width - 10, 5);
+      
+      ctx.fillStyle = '#ff4444';
+      const tankHpPercent = (enemy.hp || 5) / 5;
+      ctx.fillRect(ex + 8, enemy.y + 15, (enemy.width - 16) * tankHpPercent, 6);
+      
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(ex + 10, enemy.y + 28, 8, 8);
+      ctx.fillRect(ex + enemy.width - 18, enemy.y + 28, 8, 8);
+      ctx.fillStyle = '#000';
+      ctx.fillRect(ex + 12, enemy.y + 30, 4, 4);
+      ctx.fillRect(ex + enemy.width - 16, enemy.y + 30, 4, 4);
+      
     } else {
       ctx.fillStyle = '#9b59b6';
       ctx.fillRect(ex, enemy.y, enemy.width, enemy.height);
