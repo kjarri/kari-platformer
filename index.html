@@ -42,6 +42,11 @@
         .level-buttons {
             margin-bottom: 15px;
         }
+        @media (hover: none) and (pointer: coarse) {
+            .level-buttons {
+                display: none;
+            }
+        }
         .level-btn {
             background: #4a4e69;
             color: #fff;
@@ -65,6 +70,9 @@
             border-radius: 4px;
             background: linear-gradient(to bottom, #87ceeb, #e0f7fa);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 100%;
+            max-height: calc(100vh - 140px);
+            aspect-ratio: 4 / 3;
         }
         .controls {
             margin-top: 20px;
@@ -114,8 +122,8 @@
             }
         }
         .touch-btn {
-            width: 70px;
-            height: 70px;
+            width: 65px;
+            height: 65px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.25);
             border: 3px solid rgba(255, 255, 255, 0.5);
@@ -137,12 +145,22 @@
         }
         .touch-btn-group {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: flex-end;
         }
+        .touch-btn-group.left {
+            position: absolute;
+            left: 20px;
+            bottom: 0;
+        }
+        .touch-btn-group.right {
+            position: absolute;
+            right: 20px;
+            bottom: 0;
+        }
         .touch-btn.jump {
-            width: 80px;
-            height: 80px;
+            width: 75px;
+            height: 75px;
             background: rgba(230, 57, 70, 0.35);
             border-color: rgba(230, 57, 70, 0.6);
         }
@@ -157,6 +175,10 @@
         .touch-btn.shoot-down {
             background: rgba(0, 255, 255, 0.35);
             border-color: rgba(0, 255, 255, 0.6);
+        }
+        .touch-row {
+            display: flex;
+            gap: 12px;
         }
     </style>
 </head>
@@ -173,15 +195,19 @@
         <canvas id="gameCanvas" width="800" height="600"></canvas>
         <div id="eventLog"></div>
         <div class="touch-controls">
-            <div class="touch-btn-group">
+            <div class="touch-btn-group left">
                 <div class="touch-btn" id="touchLeft">◀</div>
                 <div class="touch-btn" id="touchRight">▶</div>
             </div>
-            <div class="touch-btn-group">
-                <div class="touch-btn shoot-up" id="touchShootUp">▲</div>
-                <div class="touch-btn" id="touchJump">●</div>
-                <div class="touch-btn shoot" id="touchShoot">▶</div>
-                <div class="touch-btn shoot-down" id="touchShootDown">▼</div>
+            <div class="touch-btn-group right">
+                <div class="touch-row">
+                    <div class="touch-btn shoot-up" id="touchShootUp">▲</div>
+                </div>
+                <div class="touch-row">
+                    <div class="touch-btn shoot" id="touchShoot">▶</div>
+                    <div class="touch-btn jump" id="touchJump">●</div>
+                    <div class="touch-btn shoot-down" id="touchShootDown">▼</div>
+                </div>
             </div>
         </div>
         <div class="controls">
