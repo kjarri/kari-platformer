@@ -1,6 +1,5 @@
 import { SCREEN_WIDTH, SCREEN_HEIGHT, GAME_STATES } from './constants.js';
 import { getKeys } from './input.js';
-import * as saveManager from './saveManager.js';
 
 let titleAnimationFrame = 0;
 let showTitle = true;
@@ -26,7 +25,7 @@ export function updateTitle() {
   
   const keys = getKeys();
   if (keys.jump || keys.shoot || keys.left || keys.right) {
-    setGameState(GAME_STATES.MENU);
+    setGameState(GAME_STATES.PLAYING);
     return true;
   }
   return false;

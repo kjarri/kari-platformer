@@ -4,7 +4,7 @@ import { initInput, getKeys, setPlayerRef, setRestartCallback } from './input.js
 import * as audio from './audio.js';
 import * as particles from './particles.js';
 import * as levelManager from './levelManager.js';
-import { setGameState, getGameState, updateTitle, drawTitleScreen, drawHUD, drawGameOver, drawWin, drawMenuScreen, drawLevelSelect, updateMenu, updateLevelSelect, triggerScreenShake, triggerHitStop, updateScreenShake, getScreenShakeOffset, updateHitStop, isHitStopped } from './ui.js';
+import { setGameState, getGameState, updateTitle, drawTitleScreen, drawHUD, drawGameOver, drawWin, triggerScreenShake, triggerHitStop, updateScreenShake, getScreenShakeOffset, updateHitStop, isHitStopped } from './ui.js';
 import * as renderer from './renderer.js';
 import * as saveManager from './saveManager.js';
 
@@ -433,16 +433,9 @@ function gameLoop() {
     if (started) {
       saveData = saveManager.loadGame();
       audio.setSoundEnabled(saveData.soundEnabled);
-    }
-  } else if (currentState === GAME_STATES.MENU) {
-    drawMenuScreen(ctx, logoImage, saveData);
-    const selected = updateMenu(() => {
       levelManager.setLevel(1);
       startNewGame();
-    }, () => {
-      levelManager.setLevel(saveManager.getHighestLevel());
-      startGame();
-    });
+    }
   } else if (currentState === GAME_STATES.PLAYING) {
     renderer.drawBackground(ctx);
     renderer.drawDecorations(ctx, cameraX);

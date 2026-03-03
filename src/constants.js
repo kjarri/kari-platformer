@@ -13,7 +13,6 @@ export const POWERUP_TYPES = {
 
 export const GAME_STATES = {
   TITLE: 'title',
-  MENU: 'menu',
   PLAYING: 'playing',
   GAMEOVER: 'gameover',
   WIN: 'win',
