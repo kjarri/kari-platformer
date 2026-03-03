@@ -16,9 +16,9 @@ let eventLog = [];
 function toggleDebug() {
     DEBUG_MODE = !DEBUG_MODE;
     const btn = document.getElementById('debugToggle');
-    btn.textContent = 'Debug: ' + (DEBUG_MODE ? 'ON' : 'OFF');
+    btn.textContent = 'Villuleit: ' + (DEBUG_MODE ? 'KVEIKT' : 'SLÖKKT');
     btn.style.background = DEBUG_MODE ? '#e63946' : '#4a4e69';
-    logEvent('Debug mode toggled: ' + (DEBUG_MODE ? 'ON' : 'OFF'));
+    logEvent('Villuleit: ' + (DEBUG_MODE ? 'KVEIKT' : 'SLÖKKT'));
 }
 
 function logEvent(msg) {
@@ -1273,7 +1273,7 @@ function drawBoss() {
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('BOSS', boss.x - cameraX + boss.width / 2, boss.y - 10);
+    ctx.fillText('YFIRMAÐUR', boss.x - cameraX + boss.width / 2, boss.y - 10);
     
     ctx.fillStyle = '#333';
     ctx.fillRect(boss.x - cameraX, boss.y - 25, boss.width, 8);
@@ -1373,7 +1373,7 @@ function updateEnemies() {
             } else if (player.invincible <= 0) {
                 if (player.shield > 0) {
                     player.shield = 0;
-                    logEvent('Shield absorbed the hit!');
+                    logEvent('Skjöldur varði höggið!');
                 } else {
                     player.health--;
                     if (player.health <= 0) {
@@ -1383,7 +1383,7 @@ function updateEnemies() {
                 }
                 player.invincible = player.invincibleDuration;
                 playDamageSound();
-                logEvent('Spilari tokkadi skada - health: ' + player.health);
+                logEvent('Spilari tók skaða - líf: ' + player.health);
             }
         }
     });
@@ -1424,7 +1424,7 @@ function updateBoss() {
         if (player.invincible <= 0) {
             if (player.shield > 0) {
                 player.shield = 0;
-                logEvent('Shield blocked boss collision!');
+                logEvent('Skjöldur varði árekstur við yfirmann!');
             } else {
                 player.health--;
                 if (player.health <= 0) {
@@ -1434,7 +1434,7 @@ function updateBoss() {
             }
             player.invincible = player.invincibleDuration;
             playDamageSound();
-            logEvent('Boss! Spilari tokkadi skada - health: ' + player.health);
+            logEvent('Yfirmaður! Spilari tók skaða - líf: ' + player.health);
         }
     }
 }
@@ -1460,7 +1460,7 @@ function updateBullets() {
             if (checkCollision(bullet, player) && player.invincible <= 0) {
                 if (player.shield > 0) {
                     player.shield = 0;
-                    logEvent('Shield blocked the bullet!');
+                    logEvent('Skjöldur varði skotið!');
                 } else {
                     player.health--;
                     if (player.health <= 0) {
@@ -1470,7 +1470,7 @@ function updateBullets() {
                 }
                 player.invincible = player.invincibleDuration;
                 playDamageSound();
-                logEvent('Spilari varð fyrir skoti - health: ' + player.health);
+                logEvent('Spilari varð fyrir skoti - líf: ' + player.health);
                 bullets.splice(i, 1);
             }
         } else {
@@ -1484,7 +1484,7 @@ function updateBullets() {
                     score += 50;
                     playWinSound();
                     createParticles(boss.x + boss.width/2, boss.y + boss.height/2, '#ff4500', 30, 10, 50);
-                    logEvent('BOSS DEFEATED!');
+                    logEvent('YFIRMAÐUR SIGRAÐUR!');
                 }
             } else {
                 for (let j = enemies.length - 1; j >= 0; j--) {
@@ -1544,7 +1544,7 @@ function drawScore() {
         ctx.fillStyle = '#ff0000';
         ctx.font = '12px Courier New';
         ctx.textAlign = 'right';
-        ctx.fillText('Player: x=' + Math.round(player.x) + ' y=' + Math.round(player.y) + ' vy=' + Math.round(player.velY), SCREEN_WIDTH - 10, SCREEN_HEIGHT - 25);
+        ctx.fillText('Spilari: x=' + Math.round(player.x) + ' y=' + Math.round(player.y) + ' vy=' + Math.round(player.velY), SCREEN_WIDTH - 10, SCREEN_HEIGHT - 25);
         if (debugInfo) {
             ctx.fillText(debugInfo, SCREEN_WIDTH - 10, SCREEN_HEIGHT - 10);
         }
@@ -1559,12 +1559,12 @@ function drawGameOver() {
     ctx.fillStyle = '#e63946';
     ctx.font = 'bold 48px Courier New';
     ctx.textAlign = 'center';
-    ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 20);
+    ctx.fillText('LEIK LOKIÐ', canvas.width / 2, canvas.height / 2 - 20);
     
     ctx.fillStyle = '#fff';
     ctx.font = '24px Courier New';
     ctx.fillText('Mynt: ' + score, canvas.width / 2, canvas.height / 2 + 30);
-    ctx.fillText('Smelltu a R til ad byrja aftur', canvas.width / 2, canvas.height / 2 + 70);
+    ctx.fillText('Smelltu á R til að byrja aftur', canvas.width / 2, canvas.height / 2 + 70);
     ctx.textAlign = 'left';
 }
 
@@ -1575,12 +1575,12 @@ function drawWin() {
     ctx.fillStyle = '#4ade80';
     ctx.font = 'bold 48px Courier New';
     ctx.textAlign = 'center';
-    ctx.fillText('THU VANNST!', canvas.width / 2, canvas.height / 2 - 20);
+    ctx.fillText('ÞÚ VANNST!', canvas.width / 2, canvas.height / 2 - 20);
     
     ctx.fillStyle = '#fff';
     ctx.font = '24px Courier New';
     ctx.fillText('Mynt: ' + score, canvas.width / 2, canvas.height / 2 + 30);
-    ctx.fillText('Smelltu a R til ad spila aftur', canvas.width / 2, canvas.height / 2 + 70);
+    ctx.fillText('Smelltu á R til að spila aftur', canvas.width / 2, canvas.height / 2 + 70);
     ctx.textAlign = 'left';
 }
 
@@ -1688,10 +1688,10 @@ function updatePlayer() {
         if (fallRespawnCooldown <= 0) {
             if (player.shield > 0) {
                 player.shield = 0;
-                logEvent('Shield lost from falling!');
+                logEvent('Skjöldur hvarf við fall!');
             } else {
                 player.health--;
-                logEvent('Fell into pit! Health: ' + player.health);
+                logEvent('Féll í gryfju! Líf: ' + player.health);
                 if (player.health <= 0) {
                     gameOver = true;
                     playGameOverSound();
@@ -1717,7 +1717,7 @@ function updatePlayer() {
         height: castle.doorHeight
     })) {
         if (currentLevel === 5 && boss && boss.alive) {
-            logEvent('You must defeat the BOSS first!');
+            logEvent('Þú verður að sigra YFIRMANNINN fyrst!');
         } else if (!gameWon) {
             gameWon = true;
             score += 10;
@@ -1746,14 +1746,14 @@ function updatePlayer() {
             
             playCoinSound();
             createParticles(powerup.x + powerup.width/2, powerup.y + powerup.height/2, powerupTypes[powerup.type].color, 10, 5, 25);
-            logEvent('Powerup collected: ' + powerup.type);
+            logEvent('Kraftur sóttur: ' + powerup.type);
         }
     });
 }
 
 function resetGame() {
     console.trace('resetGame CALLED');
-    logEvent('resetGame() called');
+    logEvent('Byrja aftur kallað');
     player.x = 100;
     player.y = 300;
     player.velX = 0;
@@ -1769,7 +1769,7 @@ function resetGame() {
     shootCooldown = 0;
     debugInfo = '';
     generateWorld();
-    logEvent('--- NEW GAME: Level ' + currentLevel + ' ---');
+    logEvent('--- NÝR LEIKUR: Borð ' + currentLevel + ' ---');
 }
 
 function selectLevel(level) {
