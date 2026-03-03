@@ -1867,6 +1867,10 @@ function setupTouchControls() {
     const touchShootDown = document.getElementById('touchShootDown');
     
     function preventDefault(e) {
+        const target = e.target;
+        if (target.tagName === 'BUTTON' || target.tagName === 'A' || target.closest('button')) {
+            return;
+        }
         if (e.cancelable) {
             e.preventDefault();
         }
