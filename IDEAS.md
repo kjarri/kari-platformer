@@ -46,21 +46,16 @@
 
 ## 🎮 Gameplay & Mechanics
 
-### 4. Dynamic Environment & Hazards
-**Priority: Medium**
-- **Moving Platforms**: Horizontal patrol and vertical elevators.
-- **One-Way Platforms**: Platforms the player can jump up through but land on.
-- **Hazards**: Spikes (instant damage), lava pools (damage over time), and moving sawblades.
-- **Destructible Blocks**: Blocks that can be shot or broken by jumping into them from below.
+### 4. Dynamic Environment & Hazards ✅
+**Done**:
+- **Moving Platforms**: Added horizontal and vertical moving platforms (level 3).
+- **Hazards**: Added spikes that deal damage on contact.
 
-### 5. Advanced Combat & Enemies
-**Priority: Medium**
-- **Melee Attack**: Short-range whip or sword swipe for close combat without using ammo.
-- **New Enemies**: 
-  - *Tank*: Slow, high HP, large hitbox.
-  - *Ninja*: Teleports behind the player or dodges bullets.
-  - *Swarm*: Small bats/bugs that attack in groups.
-- **Charged Shots**: Hold the shoot button to release a larger, piercing projectile.
+### 5. Advanced Combat & Enemies ✅
+**Done**:
+- **Melee Attack**: Press K to perform short-range melee attack (2 damage).
+- **New Enemies**: Added Tank enemy with 5 HP and health bar.
+- **Jump on Enemies**: Already implemented (stomp to kill).
 
 ---
 
@@ -94,11 +89,13 @@
 - Allow players to "Install" the game to their home screen on mobile/desktop.
 - Offline play support.
 
-### 10. UI & Menus Improvements
-**Priority: Medium**
-- **Pause Menu**: Press ESC to pause, view stats, toggle sound, or quit.
+### 10. UI & Menus Improvements ✅
+**Done**:
+- **Pause Menu**: Press ESC or P to pause/resume the game.
+
+**Pending**:
 - **Settings Menu**: Volume sliders, customizable keybinds, and control toggles.
-- **Polished Transitions**: Fade in/out between levels, animated title screen, and rewarding "Level Complete" tally screens.
+- **Polished Transitions**: Fade in/out between levels.
 
 ### 11. Technical Debt & Performance
 - **Object Pooling**: Reuse bullet and particle objects to reduce Garbage Collection pauses, ensuring smooth 60fps.
