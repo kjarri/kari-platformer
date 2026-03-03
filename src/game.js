@@ -190,6 +190,8 @@ function updatePlayer() {
     
     if (!player.invincible && checkCollision(player, enemy)) {
       if (player.takeDamage()) {
+        triggerScreenShake(8, 10);
+        triggerHitStop(3);
         audio.playDamageSound();
         particles.createExplosion(player.x + player.width/2, player.y + player.height/2, '#e63946', 10);
         if (player.health <= 0) {
@@ -210,6 +212,7 @@ function updatePlayer() {
           bullets.splice(index, 1);
           
           if (enemy.hp <= 0) {
+            triggerScreenShake(3, 5);
             audio.playEnemyDeathSound();
             particles.createExplosion(enemy.x + enemy.width/2, enemy.y + enemy.height/2, '#9b59b6', 15);
             score += 5;
@@ -224,6 +227,8 @@ function updatePlayer() {
         
         if (boss.hp <= 0) {
           boss.alive = false;
+          triggerScreenShake(15, 25);
+          triggerHitStop(10);
           audio.playWinSound();
           particles.createExplosion(boss.x + boss.width/2, boss.y + boss.height/2, '#ff4500', 40);
           score += 50;
