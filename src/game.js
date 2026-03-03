@@ -1,6 +1,6 @@
 import { SCREEN_WIDTH, SCREEN_HEIGHT, GAME_STATES, POWERUP_TYPES } from './constants.js';
 import { Player } from './player.js';
-import { initInput, getKeys, setPlayerRef } from './input.js';
+import { initInput, getKeys, setPlayerRef, setRestartCallback } from './input.js';
 import * as audio from './audio.js';
 import * as particles from './particles.js';
 import * as levelManager from './levelManager.js';
@@ -189,7 +189,18 @@ function updatePlayer() {
     if (enemy.hp !== undefined && enemy.hp <= 0) return;
     
     if (!player.invincible && checkCollision(player, enemy)) {
-      if (player.takeDamage()) {
+      const playerBottom = player.y + player.height;
+      const enemyTop = enemy.y;
+      const isStomp = player.velY > 0 && playerBottom - player.velY <= enemyTop + 10;
+      
+      if (isStomp) {
+        enemy.hp = 0;
+        player.velY = -10;
+        triggerScreenShake(3, 5);
+        audio.playEnemyDeathSound();
+        particles.createExplosion(enemy.x + enemy.width/2, enemy.y + enemy.height/2, '#9b59b6', 15);
+        score += 5;
+      } else if (player.takeDamage()) {
         triggerScreenShake(8, 10);
         triggerHitStop(3);
         audio.playDamageSound();
@@ -527,6 +538,11 @@ function init() {
   };
   
   initInput(canvas);
+  setRestartCallback(() => {
+    if (gameOver || gameWon) {
+      resetGame();
+    }
+  });
   audio.initAudio();
   
   if ('serviceWorker' in navigator) {

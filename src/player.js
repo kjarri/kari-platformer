@@ -61,7 +61,7 @@ export class Player {
       this.jumpBuffer = 0;
     }
 
-    if (wasOnGround && !this.onGround && this.velY > 0) {
+    if (wasOnGround && !this.onGround && this.velY >= 0) {
       this.coyoteTime = this.coyoteFrames;
     }
     if (this.coyoteTime > 0) this.coyoteTime--;
