@@ -50,7 +50,9 @@ const keys = {
     left: false,
     right: false,
     jump: false,
-    shoot: false
+    shoot: false,
+    shootUp: false,
+    shootDown: false
 };
 
 const player = {
@@ -66,7 +68,9 @@ const player = {
     health: 3,
     maxHealth: 3,
     invincible: 0,
-    invincibleDuration: 90
+    invincibleDuration: 90,
+    shield: 0,
+    speedBoost: 0
 };
 
 let platforms = [];
@@ -76,7 +80,15 @@ let castle = {};
 let decorations = [];
 let bullets = [];
 let particles = [];
+let powerups = [];
+let boss = null;
 let shootCooldown = 0;
+let fallRespawnCooldown = 0;
+
+const powerupTypes = {
+    shield: { color: '#00ffff', symbol: 'S', duration: 600 },
+    speed: { color: '#ffaa00', symbol: '>', duration: 400 }
+};
 
 function generateLevel1() {
     WORLD_WIDTH = SCREEN_WIDTH * 5;
@@ -85,6 +97,7 @@ function generateLevel1() {
     coins = [];
     enemies = [];
     decorations = [];
+    powerups = [];
     
     platforms.push({ x: 0, y: 550, width: 600, height: 50 });
     
@@ -149,6 +162,23 @@ function generateLevel1() {
     enemies.push({ x: 3300, y: 520, width: 32, height: 30, velX: 2, platformIndex: 16 });
     enemies.push({ x: 3600, y: 250, width: 32, height: 30, velX: 1.5, platformIndex: 18 });
     
+    enemies.push({ x: 600, y: 200, width: 32, height: 24, velX: 1.5, enemyType: 'flying', flyRange: 120 });
+    enemies.push({ x: 1300, y: 150, width: 32, height: 24, velX: -1.8, enemyType: 'flying', flyRange: 100 });
+    enemies.push({ x: 2200, y: 180, width: 32, height: 24, velX: 2, enemyType: 'flying', flyRange: 150 });
+    enemies.push({ x: 3000, y: 220, width: 32, height: 24, velX: -1.5, enemyType: 'flying', flyRange: 130 });
+    
+    enemies.push({ x: 1100, y: 290, width: 32, height: 30, velX: 1, platformIndex: 4, enemyType: 'shooter' });
+    enemies.push({ x: 2000, y: 200, width: 32, height: 30, velX: -1.2, platformIndex: 8, enemyType: 'shooter' });
+    enemies.push({ x: 2600, y: 250, width: 32, height: 30, velX: 1.5, platformIndex: 12, enemyType: 'shooter' });
+    enemies.push({ x: 3500, y: 300, width: 32, height: 30, velX: -1, platformIndex: 17, enemyType: 'shooter' });
+    
+    powerups.push(
+        { x: 950, y: 400, width: 24, height: 24, type: 'shield', collected: false },
+        { x: 1800, y: 350, width: 24, height: 24, type: 'speed', collected: false },
+        { x: 2500, y: 450, width: 24, height: 24, type: 'shield', collected: false },
+        { x: 3200, y: 300, width: 24, height: 24, type: 'speed', collected: false }
+    );
+    
     for (let i = 0; i < 12; i++) {
         decorations.push({ type: 'tree', x: 100 + i * 350, y: 530, size: 40 + Math.random() * 25 });
     }
@@ -170,6 +200,7 @@ function generateLevel2() {
     coins = [];
     enemies = [];
     decorations = [];
+    powerups = [];
     
     platforms.push({ x: 0, y: 550, width: 700, height: 50 });
     
@@ -234,6 +265,20 @@ function generateLevel2() {
     enemies.push({ x: 3050, y: 520, width: 32, height: 30, velX: 2, platformIndex: 17 });
     enemies.push({ x: 3350, y: 270, width: 32, height: 30, velX: 1.5, platformIndex: 19 });
     
+    enemies.push({ x: 500, y: 180, width: 32, height: 24, velX: 1.6, enemyType: 'flying', flyRange: 100 });
+    enemies.push({ x: 1500, y: 150, width: 32, height: 24, velX: -2, enemyType: 'flying', flyRange: 120 });
+    enemies.push({ x: 2500, y: 200, width: 32, height: 24, velX: 1.8, enemyType: 'flying', flyRange: 110 });
+    
+    enemies.push({ x: 950, y: 320, width: 32, height: 30, velX: 1, platformIndex: 6, enemyType: 'shooter' });
+    enemies.push({ x: 1850, y: 220, width: 32, height: 30, velX: -1.5, platformIndex: 10, enemyType: 'shooter' });
+    enemies.push({ x: 2800, y: 350, width: 32, height: 30, velX: 1.2, platformIndex: 16, enemyType: 'shooter' });
+    
+    powerups.push(
+        { x: 400, y: 380, width: 24, height: 24, type: 'shield', collected: false },
+        { x: 1100, y: 250, width: 24, height: 24, type: 'speed', collected: false },
+        { x: 2200, y: 400, width: 24, height: 24, type: 'shield', collected: false }
+    );
+    
     for (let i = 0; i < 10; i++) {
         decorations.push({ type: 'cactus', x: 150 + i * 380, y: 530, size: 20 + Math.random() * 15 });
     }
@@ -255,6 +300,7 @@ function generateLevel3() {
     coins = [];
     enemies = [];
     decorations = [];
+    powerups = [];
     
     platforms.push({ x: 0, y: 550, width: 350, height: 50 });
     
@@ -315,6 +361,12 @@ function generateLevel3() {
     enemies.push({ x: 2550, y: 350, width: 32, height: 30, velX: 1.5, platformIndex: 22 });
     enemies.push({ x: 2850, y: 420, width: 32, height: 30, velX: -1.2, platformIndex: 24 });
     
+    powerups.push(
+        { x: 500, y: 420, width: 24, height: 24, type: 'shield', collected: false },
+        { x: 1400, y: 320, width: 24, height: 24, type: 'speed', collected: false },
+        { x: 2500, y: 380, width: 24, height: 24, type: 'shield', collected: false }
+    );
+    
     for (let i = 0; i < 20; i++) {
         decorations.push({ type: 'stalactite', x: i * 130 + Math.random() * 80, y: Math.random() * 120, size: 15 + Math.random() * 25 });
     }
@@ -336,6 +388,7 @@ function generateLevel4() {
     coins = [];
     enemies = [];
     decorations = [];
+    powerups = [];
     
     platforms.push({ x: 0, y: 550, width: 550, height: 50 });
     
@@ -404,6 +457,12 @@ function generateLevel4() {
     enemies.push({ x: 3400, y: 520, width: 32, height: 30, velX: 2, platformIndex: 19 });
     enemies.push({ x: 3700, y: 270, width: 32, height: 30, velX: -1.8, platformIndex: 21 });
     
+    powerups.push(
+        { x: 500, y: 480, width: 24, height: 24, type: 'shield', collected: false },
+        { x: 1800, y: 300, width: 24, height: 24, type: 'speed', collected: false },
+        { x: 2800, y: 450, width: 24, height: 24, type: 'shield', collected: false }
+    );
+    
     for (let i = 0; i < 15; i++) {
         decorations.push({ type: 'snowtree', x: 80 + i * 320, y: 530, size: 45 + Math.random() * 25 });
     }
@@ -425,6 +484,7 @@ function generateLevel5() {
     coins = [];
     enemies = [];
     decorations = [];
+    powerups = [];
     
     platforms.push({ x: 0, y: 550, width: 400, height: 50 });
     
@@ -493,6 +553,12 @@ function generateLevel5() {
     enemies.push({ x: 2600, y: 430, width: 32, height: 30, velX: 1.5, platformIndex: 20 });
     enemies.push({ x: 2850, y: 370, width: 32, height: 30, velX: -1.8, platformIndex: 22 });
     
+    powerups.push(
+        { x: 300, y: 480, width: 24, height: 24, type: 'speed', collected: false },
+        { x: 1500, y: 350, width: 24, height: 24, type: 'shield', collected: false },
+        { x: 2400, y: 380, width: 24, height: 24, type: 'speed', collected: false }
+    );
+    
     for (let i = 0; i < 8; i++) {
         decorations.push({ type: 'lava', x: 100 + i * 350, y: 560, size: 25 + Math.random() * 15 });
     }
@@ -505,6 +571,20 @@ function generateLevel5() {
     
     castle = { x: WORLD_WIDTH - 200, y: 350, width: 160, height: 200, doorX: WORLD_WIDTH - 120, doorY: 420, doorWidth: 45, doorHeight: 130 };
     platforms.push({ x: WORLD_WIDTH - 250, y: 550, width: 300, height: 50 });
+    
+    boss = {
+        x: WORLD_WIDTH - 350,
+        y: 450,
+        width: 80,
+        height: 100,
+        health: 10,
+        maxHealth: 10,
+        velX: 1.5,
+        shootCooldown: 0,
+        startX: WORLD_WIDTH - 350,
+        flyRange: 100,
+        alive: true
+    };
 }
 
 function generateWorld() {
@@ -941,6 +1021,19 @@ function drawPlayer() {
         return;
     }
     
+    if (player.shield > 0) {
+        ctx.strokeStyle = `rgba(0, 255, 255, ${0.3 + Math.sin(Date.now() * 0.01) * 0.2})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(player.x - cameraX + player.width / 2, player.y + player.height / 2, player.width * 0.9, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+    
+    if (player.speedBoost > 0) {
+        ctx.fillStyle = `rgba(255, 170, 0, ${0.3 + Math.random() * 0.2})`;
+        ctx.fillRect(player.x - cameraX - 4, player.y - 4, player.width + 8, player.height + 8);
+    }
+    
     ctx.fillStyle = player.color;
     ctx.fillRect(player.x - cameraX, player.y, player.width, player.height);
     
@@ -1042,29 +1135,99 @@ function drawCoins() {
     });
 }
 
+function drawPowerups() {
+    powerups.forEach(powerup => {
+        if (powerup.collected) return;
+        if (powerup.x - cameraX > SCREEN_WIDTH || powerup.x + powerup.width - cameraX < 0) return;
+        
+        const type = powerupTypes[powerup.type];
+        
+        ctx.fillStyle = type.color;
+        ctx.beginPath();
+        ctx.arc(powerup.x - cameraX + powerup.width / 2, powerup.y + powerup.height / 2, 14, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(type.symbol, powerup.x - cameraX + powerup.width / 2, powerup.y + powerup.height / 2 + 5);
+        ctx.textAlign = 'left';
+    });
+}
+
 function drawEnemies() {
     enemies.forEach(enemy => {
         if (enemy.x - cameraX > SCREEN_WIDTH || enemy.x + enemy.width - cameraX < 0) return;
         
-        ctx.fillStyle = '#6a4c93';
-        ctx.fillRect(enemy.x - cameraX, enemy.y, enemy.width, enemy.height);
+        const type = enemy.enemyType || 'ground';
         
-        ctx.fillStyle = '#9d4edd';
-        ctx.fillRect(enemy.x - cameraX, enemy.y, enemy.width, 8);
-        
-        ctx.fillStyle = '#ff0000';
-        ctx.fillRect(enemy.x - cameraX + 6, enemy.y + 12, 8, 8);
-        ctx.fillRect(enemy.x - cameraX + 18, enemy.y + 12, 8, 8);
-        
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(enemy.x - cameraX + 7, enemy.y + 13, 3, 3);
-        ctx.fillRect(enemy.x - cameraX + 19, enemy.y + 13, 3, 3);
+        if (type === 'ground') {
+            ctx.fillStyle = '#6a4c93';
+            ctx.fillRect(enemy.x - cameraX, enemy.y, enemy.width, enemy.height);
+            
+            ctx.fillStyle = '#9d4edd';
+            ctx.fillRect(enemy.x - cameraX, enemy.y, enemy.width, 8);
+            
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(enemy.x - cameraX + 6, enemy.y + 12, 8, 8);
+            ctx.fillRect(enemy.x - cameraX + 18, enemy.y + 12, 8, 8);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(enemy.x - cameraX + 7, enemy.y + 13, 3, 3);
+            ctx.fillRect(enemy.x - cameraX + 19, enemy.y + 13, 3, 3);
+        } else if (type === 'flying') {
+            ctx.fillStyle = '#e63946';
+            ctx.beginPath();
+            ctx.ellipse(enemy.x - cameraX + enemy.width/2, enemy.y + enemy.height/2, enemy.width/2, enemy.height/3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.moveTo(enemy.x - cameraX, enemy.y + enemy.height/2);
+            ctx.lineTo(enemy.x - cameraX - 15, enemy.y + enemy.height/2 - 10);
+            ctx.lineTo(enemy.x - cameraX - 15, enemy.y + enemy.height/2 + 10);
+            ctx.closePath();
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(enemy.x - cameraX + enemy.width, enemy.y + enemy.height/2);
+            ctx.lineTo(enemy.x - cameraX + enemy.width + 15, enemy.y + enemy.height/2 - 10);
+            ctx.lineTo(enemy.x - cameraX + enemy.width + 15, enemy.y + enemy.height/2 + 10);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(enemy.x - cameraX + 8, enemy.y + 10, 6, 6);
+            ctx.fillRect(enemy.x - cameraX + 20, enemy.y + 10, 6, 6);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(enemy.x - cameraX + 9, enemy.y + 11, 2, 2);
+            ctx.fillRect(enemy.x - cameraX + 21, enemy.y + 11, 2, 2);
+        } else if (type === 'shooter') {
+            ctx.fillStyle = '#2d6a4f';
+            ctx.fillRect(enemy.x - cameraX, enemy.y, enemy.width, enemy.height);
+            
+            ctx.fillStyle = '#40916c';
+            ctx.fillRect(enemy.x - cameraX, enemy.y, enemy.width, 6);
+            
+            ctx.fillStyle = '#52b788';
+            ctx.fillRect(enemy.x - cameraX + 12, enemy.y - 8, 8, 10);
+            
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(enemy.x - cameraX + 6, enemy.y + 14, 6, 6);
+            ctx.fillRect(enemy.x - cameraX + 20, enemy.y + 14, 6, 6);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(enemy.x - cameraX + 7, enemy.y + 15, 2, 2);
+            ctx.fillRect(enemy.x - cameraX + 21, enemy.y + 15, 2, 2);
+        }
     });
 }
 
 function drawBullets() {
     bullets.forEach(bullet => {
-        ctx.fillStyle = '#ffeb3b';
+        if (bullet.isEnemyBullet) {
+            ctx.fillStyle = '#ff4444';
+        } else {
+            ctx.fillStyle = '#ffeb3b';
+        }
         ctx.beginPath();
         ctx.arc(bullet.x - cameraX, bullet.y, 5, 0, Math.PI * 2);
         ctx.fill();
@@ -1073,6 +1236,50 @@ function drawBullets() {
         ctx.arc(bullet.x - cameraX, bullet.y, 2, 0, Math.PI * 2);
         ctx.fill();
     });
+}
+
+function drawBoss() {
+    if (!boss || !boss.alive) return;
+    if (boss.x - cameraX > SCREEN_WIDTH || boss.x + boss.width - cameraX < 0) return;
+    
+    ctx.fillStyle = '#8b0000';
+    ctx.fillRect(boss.x - cameraX, boss.y, boss.width, boss.height);
+    
+    ctx.fillStyle = '#dc143c';
+    ctx.fillRect(boss.x - cameraX + 10, boss.y + 10, boss.width - 20, 20);
+    
+    ctx.fillStyle = '#ffff00';
+    ctx.beginPath();
+    ctx.arc(boss.x - cameraX + 25, boss.y + 35, 8, 0, Math.PI * 2);
+    ctx.arc(boss.x - cameraX + 55, boss.y + 35, 8, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.fillStyle = '#000';
+    ctx.fillRect(boss.x - cameraX + 22, boss.y + 32, 6, 6);
+    ctx.fillRect(boss.x - cameraX + 52, boss.y + 32, 6, 6);
+    
+    ctx.fillStyle = '#ff4500';
+    ctx.beginPath();
+    ctx.moveTo(boss.x - cameraX + boss.width / 2, boss.y + boss.height);
+    ctx.lineTo(boss.x - cameraX + boss.width / 2 - 15, boss.y + boss.height + 20);
+    ctx.lineTo(boss.x - cameraX + boss.width / 2 + 15, boss.y + boss.height + 20);
+    ctx.closePath();
+    ctx.fill();
+    
+    ctx.fillStyle = '#333';
+    ctx.fillRect(boss.x - cameraX - 10, boss.y + 30, 15, 20);
+    ctx.fillRect(boss.x - cameraX + boss.width - 5, boss.y + 30, 15, 20);
+    
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('BOSS', boss.x - cameraX + boss.width / 2, boss.y - 10);
+    
+    ctx.fillStyle = '#333';
+    ctx.fillRect(boss.x - cameraX, boss.y - 25, boss.width, 8);
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(boss.x - cameraX + 1, boss.y - 24, (boss.width - 2) * (boss.health / boss.maxHealth), 6);
+    ctx.textAlign = 'left';
 }
 
 function drawCastle() {
@@ -1104,18 +1311,52 @@ function drawCastle() {
 
 function updateEnemies() {
     enemies.forEach(enemy => {
-        const platform = platforms[enemy.platformIndex];
-        if (!platform) return;
+        const type = enemy.enemyType || 'ground';
         
-        enemy.x += enemy.velX;
-        
-        if (enemy.x <= platform.x) {
-            enemy.x = platform.x;
-            enemy.velX = Math.abs(enemy.velX);
-        }
-        if (enemy.x + enemy.width >= platform.x + platform.width) {
-            enemy.x = platform.x + platform.width - enemy.width;
-            enemy.velX = -Math.abs(enemy.velX);
+        if (type === 'ground' || type === 'shooter') {
+            const platform = platforms[enemy.platformIndex];
+            if (!platform) return;
+            
+            enemy.x += enemy.velX;
+            
+            if (enemy.x <= platform.x) {
+                enemy.x = platform.x;
+                enemy.velX = Math.abs(enemy.velX);
+            }
+            if (enemy.x + enemy.width >= platform.x + platform.width) {
+                enemy.x = platform.x + platform.width - enemy.width;
+                enemy.velX = -Math.abs(enemy.velX);
+            }
+            
+            if (type === 'shooter') {
+                if (!enemy.shootCooldown) enemy.shootCooldown = 0;
+                enemy.shootCooldown--;
+                
+                if (enemy.shootCooldown <= 0 && Math.abs(player.x - enemy.x) < 400) {
+                    const dir = player.x < enemy.x ? -1 : 1;
+                    bullets.push({
+                        x: enemy.x + enemy.width / 2,
+                        y: enemy.y,
+                        velX: dir * 4,
+                        isEnemyBullet: true
+                    });
+                    enemy.shootCooldown = 120;
+                }
+            }
+        } else if (type === 'flying') {
+            enemy.x += enemy.velX;
+            
+            if (!enemy.startX) enemy.startX = enemy.x;
+            if (!enemy.flyRange) enemy.flyRange = 150;
+            
+            if (enemy.x <= enemy.startX - enemy.flyRange) {
+                enemy.velX = Math.abs(enemy.velX);
+            }
+            if (enemy.x >= enemy.startX + enemy.flyRange) {
+                enemy.velX = -Math.abs(enemy.velX);
+            }
+            
+            enemy.y += Math.sin(Date.now() * 0.003) * 1.5;
         }
         
         if (checkCollision(player, enemy)) {
@@ -1128,26 +1369,83 @@ function updateEnemies() {
                 player.velY = -10;
                 score += 2;
                 playEnemyDeathSound();
+                createParticles(enemy.x + enemy.width/2, enemy.y + enemy.height/2, '#9d4edd', 12, 6, 25);
             } else if (player.invincible <= 0) {
-                player.health--;
+                if (player.shield > 0) {
+                    player.shield = 0;
+                    logEvent('Shield absorbed the hit!');
+                } else {
+                    player.health--;
+                    if (player.health <= 0) {
+                        gameOver = true;
+                        playGameOverSound();
+                    }
+                }
                 player.invincible = player.invincibleDuration;
                 playDamageSound();
                 logEvent('Spilari tokkadi skada - health: ' + player.health);
+            }
+        }
+    });
+}
+
+function updateBoss() {
+    if (!boss || !boss.alive) return;
+    
+    boss.x += boss.velX;
+    
+    if (boss.x <= boss.startX - boss.flyRange) {
+        boss.velX = Math.abs(boss.velX);
+    }
+    if (boss.x >= boss.startX + boss.flyRange) {
+        boss.velX = -Math.abs(boss.velX);
+    }
+    
+    boss.y = 400 + Math.sin(Date.now() * 0.002) * 30;
+    
+    if (boss.shootCooldown > 0) {
+        boss.shootCooldown--;
+    } else if (Math.abs(player.x - boss.x) < 500) {
+        const dir = player.x < boss.x ? -1 : 1;
+        bullets.push({
+            x: boss.x + boss.width / 2,
+            y: boss.y + boss.height / 2,
+            velX: dir * 5,
+            velY: (player.y - boss.y) * 0.02,
+            width: 12,
+            height: 12,
+            isEnemyBullet: true,
+            isBossBullet: true
+        });
+        boss.shootCooldown = 90;
+    }
+    
+    if (checkCollision(player, boss)) {
+        if (player.invincible <= 0) {
+            if (player.shield > 0) {
+                player.shield = 0;
+                logEvent('Shield blocked boss collision!');
+            } else {
+                player.health--;
                 if (player.health <= 0) {
                     gameOver = true;
                     playGameOverSound();
                 }
             }
+            player.invincible = player.invincibleDuration;
+            playDamageSound();
+            logEvent('Boss! Spilari tokkadi skada - health: ' + player.health);
         }
-    });
+    }
 }
 
 function updateBullets() {
     for (let i = bullets.length - 1; i >= 0; i--) {
         const bullet = bullets[i];
         bullet.x += bullet.velX;
+        bullet.y += bullet.velY || 0;
         
-        if (bullet.x < 0 || bullet.x > WORLD_WIDTH) {
+        if (bullet.x < 0 || bullet.x > WORLD_WIDTH || bullet.y < 0 || bullet.y > SCREEN_HEIGHT) {
             bullets.splice(i, 1);
             continue;
         }
@@ -1158,15 +1456,48 @@ function updateBullets() {
             }
         });
         
-        for (let j = enemies.length - 1; j >= 0; j--) {
-            const enemy = enemies[j];
-            if (checkCollision(bullet, enemy)) {
-                enemies.splice(j, 1);
+        if (bullet.isEnemyBullet) {
+            if (checkCollision(bullet, player) && player.invincible <= 0) {
+                if (player.shield > 0) {
+                    player.shield = 0;
+                    logEvent('Shield blocked the bullet!');
+                } else {
+                    player.health--;
+                    if (player.health <= 0) {
+                        gameOver = true;
+                        playGameOverSound();
+                    }
+                }
+                player.invincible = player.invincibleDuration;
+                playDamageSound();
+                logEvent('Spilari varð fyrir skoti - health: ' + player.health);
                 bullets.splice(i, 1);
-                score += 2;
-                playEnemyDeathSound();
-                createParticles(enemy.x + enemy.width/2, enemy.y + enemy.height/2, '#9d4edd', 12, 6, 25);
-                break;
+            }
+        } else {
+            if (boss && boss.alive && checkCollision(bullet, boss)) {
+                boss.health--;
+                bullets.splice(i, 1);
+                createParticles(bullet.x, bullet.y, '#ff0000', 8, 4, 15);
+                
+                if (boss.health <= 0) {
+                    boss.alive = false;
+                    score += 50;
+                    playWinSound();
+                    createParticles(boss.x + boss.width/2, boss.y + boss.height/2, '#ff4500', 30, 10, 50);
+                    logEvent('BOSS DEFEATED!');
+                }
+            } else {
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    const enemy = enemies[j];
+                    if (checkCollision(bullet, enemy)) {
+                        enemies.splice(j, 1);
+                        bullets.splice(i, 1);
+                        score += 2;
+                        playEnemyDeathSound();
+                        createParticles(enemy.x + enemy.width/2, enemy.y + enemy.height/2, '#9d4edd', 12, 6, 25);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -1194,6 +1525,19 @@ function drawScore() {
             ctx.arc(20 + i * 30, 100, 10, 0, Math.PI * 2);
             ctx.fill();
         }
+    }
+    
+    let powerupY = 130;
+    if (player.shield > 0) {
+        ctx.fillStyle = '#00ffff';
+        ctx.font = 'bold 14px Courier New';
+        ctx.fillText('🛡️ ' + Math.ceil(player.shield / 60), 20, powerupY);
+        powerupY += 20;
+    }
+    if (player.speedBoost > 0) {
+        ctx.fillStyle = '#ffaa00';
+        ctx.font = 'bold 14px Courier New';
+        ctx.fillText('⚡ ' + Math.ceil(player.speedBoost / 60), 20, powerupY);
     }
     
     if (DEBUG_MODE) {
@@ -1257,12 +1601,16 @@ function updateCamera() {
 
 function updatePlayer() {
     if (player.invincible > 0) player.invincible--;
+    if (player.shield > 0) player.shield--;
+    if (player.speedBoost > 0) player.speedBoost--;
+    
+    const currentSpeed = player.speedBoost > 0 ? MOVE_SPEED * 1.5 : MOVE_SPEED;
     
     if (keys.left) {
-        player.velX = -MOVE_SPEED;
+        player.velX = -currentSpeed;
         player.facingRight = false;
     } else if (keys.right) {
-        player.velX = MOVE_SPEED;
+        player.velX = currentSpeed;
         player.facingRight = true;
     } else {
         player.velX *= FRICTION;
@@ -1270,12 +1618,29 @@ function updatePlayer() {
 
     if (shootCooldown > 0) shootCooldown--;
     
-    if (keys.shoot && shootCooldown === 0) {
-        const bulletX = player.facingRight ? player.x + player.width : player.x;
+    if ((keys.shoot || keys.shootUp || keys.shootDown) && shootCooldown === 0) {
+        let velX = 0, velY = 0;
+        let bulletX, bulletY;
+        
+        if (keys.shootUp) {
+            velY = -12;
+            bulletX = player.x + player.width / 2;
+            bulletY = player.y;
+        } else if (keys.shootDown) {
+            velY = 12;
+            bulletX = player.x + player.width / 2;
+            bulletY = player.y + player.height;
+        } else {
+            velX = player.facingRight ? 12 : -12;
+            bulletX = player.facingRight ? player.x + player.width : player.x;
+            bulletY = player.y + player.height / 2;
+        }
+        
         bullets.push({
             x: bulletX,
-            y: player.y + player.height / 2,
-            velX: player.facingRight ? 12 : -12,
+            y: bulletY,
+            velX: velX,
+            velY: velY,
             width: 10,
             height: 10
         });
@@ -1320,9 +1685,30 @@ function updatePlayer() {
     if (player.x + player.width > WORLD_WIDTH) player.x = WORLD_WIDTH - player.width;
 
     if (player.y > canvas.height) {
-        if (!gameOver) playGameOverSound();
-        gameOver = true;
+        if (fallRespawnCooldown <= 0) {
+            if (player.shield > 0) {
+                player.shield = 0;
+                logEvent('Shield lost from falling!');
+            } else {
+                player.health--;
+                logEvent('Fell into pit! Health: ' + player.health);
+                if (player.health <= 0) {
+                    gameOver = true;
+                    playGameOverSound();
+                }
+            }
+            
+            fallRespawnCooldown = 60;
+            
+            player.x = Math.max(50, player.x - 200);
+            player.y = 100;
+            player.velX = 0;
+            player.velY = 0;
+            player.invincible = 30;
+        }
     }
+    
+    if (fallRespawnCooldown > 0) fallRespawnCooldown--;
 
     if (checkCollision(player, {
         x: castle.doorX,
@@ -1330,7 +1716,9 @@ function updatePlayer() {
         width: castle.doorWidth,
         height: castle.doorHeight
     })) {
-        if (!gameWon) {
+        if (currentLevel === 5 && boss && boss.alive) {
+            logEvent('You must defeat the BOSS first!');
+        } else if (!gameWon) {
             gameWon = true;
             score += 10;
             playWinSound();
@@ -1343,6 +1731,22 @@ function updatePlayer() {
             score++;
             playCoinSound();
             createParticles(coin.x + coin.width/2, coin.y + coin.height/2, '#ffd700', 8, 4, 20);
+        }
+    });
+    
+    powerups.forEach(powerup => {
+        if (!powerup.collected && checkCollision(player, powerup)) {
+            powerup.collected = true;
+            
+            if (powerup.type === 'shield') {
+                player.shield = powerupTypes.shield.duration;
+            } else if (powerup.type === 'speed') {
+                player.speedBoost = powerupTypes.speed.duration;
+            }
+            
+            playCoinSound();
+            createParticles(powerup.x + powerup.width/2, powerup.y + powerup.height/2, powerupTypes[powerup.type].color, 10, 5, 25);
+            logEvent('Powerup collected: ' + powerup.type);
         }
     });
 }
@@ -1383,7 +1787,9 @@ function gameLoop() {
     drawCastle();
     drawPlatforms();
     drawCoins();
+    drawPowerups();
     drawEnemies();
+    drawBoss();
     drawBullets();
     drawParticles();
     drawPlayer();
@@ -1392,6 +1798,7 @@ function gameLoop() {
     if (!gameOver && !gameWon) {
         updatePlayer();
         updateEnemies();
+        updateBoss();
         updateBullets();
         updateParticles();
         updateCamera();
@@ -1411,10 +1818,22 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'a' || e.key === 'A') keys.left = true;
     if (e.key === 'd' || e.key === 'D') keys.right = true;
     if (e.key === 'w' || e.key === 'W' || e.key === ' ') keys.jump = true;
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         keys.shoot = true;
+        keys.shootUp = false;
+        keys.shootDown = false;
         if (e.key === 'ArrowLeft') player.facingRight = false;
         if (e.key === 'ArrowRight') player.facingRight = true;
+    }
+    if (e.key === 'ArrowUp') {
+        keys.shootUp = true;
+        keys.shoot = false;
+        keys.shootDown = false;
+    }
+    if (e.key === 'ArrowDown') {
+        keys.shootDown = true;
+        keys.shoot = false;
+        keys.shootUp = false;
     }
     if (e.key === 'r' || e.key === 'R') {
         if (gameOver || gameWon) resetGame();
@@ -1425,10 +1844,74 @@ document.addEventListener('keyup', (e) => {
     if (e.key === 'a' || e.key === 'A') keys.left = false;
     if (e.key === 'd' || e.key === 'D') keys.right = false;
     if (e.key === 'w' || e.key === 'W' || e.key === ' ') keys.jump = false;
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         keys.shoot = false;
+    }
+    if (e.key === 'ArrowUp') {
+        keys.shootUp = false;
+    }
+    if (e.key === 'ArrowDown') {
+        keys.shootDown = false;
     }
 });
 
 generateWorld();
 gameLoop();
+
+function setupTouchControls() {
+    const touchLeft = document.getElementById('touchLeft');
+    const touchRight = document.getElementById('touchRight');
+    const touchJump = document.getElementById('touchJump');
+    const touchShoot = document.getElementById('touchShoot');
+    const touchShootUp = document.getElementById('touchShootUp');
+    const touchShootDown = document.getElementById('touchShootDown');
+    
+    function preventDefault(e) {
+        if (e.cancelable) {
+            e.preventDefault();
+        }
+    }
+    
+    const touchEvents = {
+        left: { el: touchLeft, key: 'left' },
+        right: { el: touchRight, key: 'right' },
+        jump: { el: touchJump, key: 'jump' },
+        shoot: { el: touchShoot, key: 'shoot' },
+        shootUp: { el: touchShootUp, key: 'shootUp' },
+        shootDown: { el: touchShootDown, key: 'shootDown' }
+    };
+    
+    Object.values(touchEvents).forEach(({ el, key }) => {
+        if (!el) return;
+        
+        el.addEventListener('touchstart', (e) => {
+            preventDefault(e);
+            keys[key] = true;
+            el.classList.add('active');
+            if (key === 'left') player.facingRight = false;
+            if (key === 'right') player.facingRight = true;
+        }, { passive: false });
+        
+        el.addEventListener('touchend', (e) => {
+            preventDefault(e);
+            keys[key] = false;
+            el.classList.remove('active');
+        }, { passive: false });
+        
+        el.addEventListener('touchcancel', (e) => {
+            keys[key] = false;
+            el.classList.remove('active');
+        }, { passive: false });
+    });
+    
+    document.addEventListener('touchmove', preventDefault, { passive: false });
+    document.addEventListener('touchstart', preventDefault, { passive: false });
+    
+    document.addEventListener('gesturestart', preventDefault);
+    document.addEventListener('gesturechange', preventDefault);
+    document.addEventListener('gestureend', preventDefault);
+}
+
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    setupTouchControls();
+}
