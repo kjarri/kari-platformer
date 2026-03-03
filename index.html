@@ -13,14 +13,33 @@
         body {
             background: #1a1a2e;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
             min-height: 100vh;
+            padding: 10px;
             font-family: 'Courier New', monospace;
+        }
+        @media (min-width: 768px) {
+            body {
+                justify-content: center;
+                min-height: 100vh;
+                padding: 0;
+            }
         }
         .game-container {
             text-align: center;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+        @media (min-width: 768px) {
+            .game-container {
+                display: block;
+            }
         }
         #debugToggle {
             position: absolute;
@@ -71,8 +90,19 @@
             background: linear-gradient(to bottom, #87ceeb, #e0f7fa);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             max-width: 100%;
-            max-height: calc(100vh - 140px);
             aspect-ratio: 4 / 3;
+            margin-bottom: 20px;
+        }
+        @media (hover: none) and (pointer: coarse) {
+            canvas {
+                max-height: calc(100vh - 250px);
+            }
+        }
+        @media (min-width: 768px) {
+            canvas {
+                max-height: calc(100vh - 140px);
+                margin-bottom: 0;
+            }
         }
         .controls {
             margin-top: 20px;
@@ -104,18 +134,21 @@
         }
         .touch-controls {
             display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            padding: 0 20px;
+            width: 100%;
+            max-width: 500px;
+            padding: 10px 20px;
             justify-content: space-between;
             pointer-events: none;
             z-index: 1000;
+            margin-top: auto;
         }
         @media (hover: none) and (pointer: coarse) {
             .touch-controls {
                 display: flex;
+                position: relative;
+                bottom: auto;
+                left: auto;
+                right: auto;
             }
             .controls {
                 display: none;
@@ -147,16 +180,19 @@
             display: flex;
             gap: 12px;
             align-items: flex-end;
+            position: relative;
         }
-        .touch-btn-group.left {
-            position: absolute;
-            left: 20px;
-            bottom: 0;
-        }
-        .touch-btn-group.right {
-            position: absolute;
-            right: 20px;
-            bottom: 0;
+        @media (min-width: 768px) {
+            .touch-btn-group.left {
+                position: absolute;
+                left: 20px;
+                bottom: 0;
+            }
+            .touch-btn-group.right {
+                position: absolute;
+                right: 20px;
+                bottom: 0;
+            }
         }
         .touch-btn.jump {
             width: 75px;
