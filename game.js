@@ -1507,7 +1507,7 @@ function drawScore() {
     ctx.fillStyle = currentTheme === 'cave' || currentTheme === 'volcanic' ? '#fff' : '#1d3557';
     ctx.font = 'bold 24px Courier New';
     ctx.fillText('Mynt: ' + score, 20, 40);
-    ctx.fillText('Level: ' + currentLevel, 20, 70);
+    ctx.fillText('Borð: ' + currentLevel, 20, 70);
     
     for (let i = 0; i < player.maxHealth; i++) {
         if (i < player.health) {
